@@ -33,6 +33,23 @@
 
 /*
 ==================
+Cmd_PrintPosition
+==================
+*/
+void Cmd_PrintPosition(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (!player) {
+		common->Printf("ERROR: Cmd_PrintPosition failed, since GetLocalPlayer() was NULL.\n");
+		return;
+	}
+	idVec3 origin;
+	idMat3 axis;
+	player->GetPosition(origin, axis);
+	gameLocal.Printf("Position: (%f, %f, %f)\n", origin.x, origin.y, origin.z);
+}
+
+/*
+==================
 Cmd_GetFloatArg
 ==================
 */
@@ -3233,6 +3250,7 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "buy",					Cmd_BuyItem_f,				CMD_FL_GAME,				"Buy an item (if in a buy zone and the game type supports it)" );
 // RITUAL END
 
+	cmdSystem->AddCommand("pos",					Cmd_PrintPosition,			CMD_FL_GAME,				"Print the player's position.");
 }
 
 /*
