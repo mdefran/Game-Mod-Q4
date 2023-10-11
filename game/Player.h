@@ -270,6 +270,9 @@ public:
 class idPlayer : public idActor {
 public:
 
+	int timer;
+	int difficulty;
+
  	enum {
  		EVENT_IMPULSE = idEntity::EVENT_MAXEVENTS,
  		EVENT_EXIT_TELEPORTER,

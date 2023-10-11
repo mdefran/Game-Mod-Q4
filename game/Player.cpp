@@ -1081,6 +1081,9 @@ idPlayer::idPlayer
 idPlayer::idPlayer() {
 	memset( &usercmd, 0, sizeof( usercmd ) );
 
+	timer = 0;
+	difficulty = 0;
+
 	alreadyDidTeamAnnouncerSound = false;
 
 	doInitWeapon			= false;
@@ -1810,6 +1813,10 @@ Prepare any resources used by the player.
 void idPlayer::Spawn( void ) {
 	idStr		temp;
 	idBounds	bounds;
+
+	idPlayer *player = gameLocal.GetLocalPlayer();
+	player->timer = 0;
+	player->difficulty = 0;
 
 	if ( entityNumber >= MAX_CLIENTS ) {
 		gameLocal.Error( "entityNum > MAX_CLIENTS for player.  Player may only be spawned with a client." );
@@ -9279,12 +9286,45 @@ void idPlayer::LoadDeferredModel( void ) {
 
 /*
 ==============
+SpawnEnemies
+
+Spawns enemies near the player according to the difficulty scaling
+==============
+*/
+void SpawnEnemies(idPlayer *player) {
+	// Increase the timer every tic the player is alive
+	player->timer++;
+
+	// Increase the difficulty coefficient every minute
+	if (player->timer > 3600 && player->timer % 3600 == 0)
+		player->difficulty++;
+
+	// Define variables relying on difficulty
+	int hordeSize = 0;
+
+	// Spawn enemies every 10 seconds
+	if (player->timer && player->timer % 600 == 0) {
+		gameLocal.Printf("\nSPAWNER\n");
+		idCmdArgs args;
+		args.AppendArg("spawnRand");
+		args.AppendArg("monster_strogg_marine");
+
+		for (int i = 0; i < hordeSize; i++)
+			Cmd_SpawnRandom_f(args);
+	}
+}
+
+/*
+==============
 idPlayer::Think
 
 Called every tic for each player
 ==============
 */
 void idPlayer::Think( void ) {
+	gameLocal.Printf("%i  ", this->timer);
+	SpawnEnemies(this);
+
 	renderEntity_t *headRenderEnt;
  
 	if ( talkingNPC ) {
@@ -9645,20 +9685,6 @@ void idPlayer::Think( void ) {
 		inBuyZone = false;
 
 	inBuyZonePrev = false;
-
-	this->GiveCash(1);
-
-	if (this->GetCash() >= 300) {
-		gameLocal.Printf("\nSPAWNER\n");
-		float newBalance = this->GetCash() - 300;
-		this->SetCash(newBalance);
-		
-		idCmdArgs args;
-		args.AppendArg("spawnRand");
-		args.AppendArg("monster_strogg_marine");
-
-		Cmd_SpawnRandom_f(args);
-	}
 }
 
 /*

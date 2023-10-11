@@ -79,7 +79,7 @@ void Cmd_SpawnRandom_f(const idCmdArgs& args) {
 	dict.Set("angle", va("%f", yaw + 180));
 
 	// Generate a random position within a fixed radius from the player using idRandom
-	float radius = 50.0f;
+	float radius = 250.0f;
 	idRandom random;
 	random.SetSeed(gameLocal.time);
 
