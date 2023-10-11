@@ -18,6 +18,8 @@
 #include "Healing_Station.h"
 #include "ai/AI_Medic.h"
 
+#include "GameSys/SysCmds.h"
+
 // RAVEN BEGIN
 // nrausch: support for turning the weapon change ui on and off
 #ifdef _XENON
@@ -9643,6 +9645,20 @@ void idPlayer::Think( void ) {
 		inBuyZone = false;
 
 	inBuyZonePrev = false;
+
+	this->GiveCash(1);
+
+	if (this->GetCash() >= 300) {
+		gameLocal.Printf("\nSPAWNER\n");
+		float newBalance = this->GetCash() - 300;
+		this->SetCash(newBalance);
+		
+		idCmdArgs args;
+		args.AppendArg("spawnRand");
+		args.AppendArg("monster_strogg_marine");
+
+		Cmd_SpawnRandom_f(args);
+	}
 }
 
 /*
