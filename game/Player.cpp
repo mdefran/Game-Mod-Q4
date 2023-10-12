@@ -1081,7 +1081,7 @@ idPlayer::idPlayer
 idPlayer::idPlayer() {
 	memset( &usercmd, 0, sizeof( usercmd ) );
 
-	timer = 0;
+	timer = -12500; // Account for initial load in time and give the player a grace period
 	difficulty = 0;
 
 	alreadyDidTeamAnnouncerSound = false;
@@ -1813,10 +1813,6 @@ Prepare any resources used by the player.
 void idPlayer::Spawn( void ) {
 	idStr		temp;
 	idBounds	bounds;
-
-	idPlayer *player = gameLocal.GetLocalPlayer();
-	player->timer = 0;
-	player->difficulty = 0;
 
 	if ( entityNumber >= MAX_CLIENTS ) {
 		gameLocal.Error( "entityNum > MAX_CLIENTS for player.  Player may only be spawned with a client." );
@@ -2776,6 +2772,12 @@ void idPlayer::SpawnFromSpawnSpot( void ) {
 		forceRespawn = true;
 		return;
 	}
+
+	// Hard coded for airdefense1
+	spawn_origin.x = 9650;
+	spawn_origin.y = -8200;
+	spawn_origin.z = 128.25;
+
 	SpawnToPoint( spawn_origin, spawn_angles );
 }
 
@@ -9296,14 +9298,14 @@ void SpawnEnemies(idPlayer *player) {
 	player->timer++;
 
 	// Increase the difficulty coefficient every minute
-	if (player->timer > 3600 && player->timer % 3600 == 0)
+	if (player->timer >= 3600 && player->timer % 3600 == 0)
 		player->difficulty++;
 
-	// Define variables relying on difficulty
-	int hordeSize = 0;
+	// Double the horde size with difficulty increase
+	int hordeSize = (1 + player->difficulty) * 2;
 
 	// Spawn enemies every 10 seconds
-	if (player->timer && player->timer % 600 == 0) {
+	if (player->timer >= 600 && player->timer % 600 == 0) {
 		gameLocal.Printf("\nSPAWNER\n");
 		idCmdArgs args;
 		args.AppendArg("spawnRand");
@@ -9322,7 +9324,7 @@ Called every tic for each player
 ==============
 */
 void idPlayer::Think( void ) {
-	gameLocal.Printf("%i  ", this->timer);
+	gameLocal.Printf("%i ", this->timer);
 	SpawnEnemies(this);
 
 	renderEntity_t *headRenderEnt;
