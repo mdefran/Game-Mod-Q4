@@ -9288,12 +9288,12 @@ void idPlayer::LoadDeferredModel( void ) {
 
 /*
 ==============
-SpawnEnemies
+EnemySpawnDirector
 
-Spawns enemies near the player according to the difficulty scaling
+Manages enemy spawns with scaling difficulty
 ==============
 */
-void SpawnEnemies(idPlayer *player) {
+void EnemySpawnDirector(idPlayer *player) {
 	// Increase the timer every tic the player is alive
 	player->timer++;
 
@@ -9306,13 +9306,12 @@ void SpawnEnemies(idPlayer *player) {
 
 	// Spawn enemies every 10 seconds
 	if (player->timer >= 600 && player->timer % 600 == 0) {
-		gameLocal.Printf("\nSPAWNER\n");
 		idCmdArgs args;
 		args.AppendArg("spawnRand");
+		args.AppendArg(va("%d", hordeSize));
 		args.AppendArg("monster_strogg_marine");
 
-		for (int i = 0; i < hordeSize; i++)
-			Cmd_SpawnRandom_f(args);
+		Cmd_SpawnRandom_f(args);
 	}
 }
 
@@ -9324,8 +9323,7 @@ Called every tic for each player
 ==============
 */
 void idPlayer::Think( void ) {
-	gameLocal.Printf("%i ", this->timer);
-	SpawnEnemies(this);
+	EnemySpawnDirector(this);
 
 	renderEntity_t *headRenderEnt;
  

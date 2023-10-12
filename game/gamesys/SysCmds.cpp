@@ -52,7 +52,6 @@ void Cmd_PrintPosition_f(const idCmdArgs& args) {
 ===================
 Cmd_SpawnRandom_f
 ===================
-*/
 void Cmd_SpawnRandom_f(const idCmdArgs& args) {
 #ifndef _MPBETA
 	const char* key, * value;
@@ -104,6 +103,63 @@ void Cmd_SpawnRandom_f(const idCmdArgs& args) {
 		gameLocal.Printf("spawned entity '%s'\n", newEnt->name.c_str());
 	}
 	// RAVEN END
+#endif // !_MPBETA
+}
+*/
+
+void Cmd_SpawnRandom_f(const idCmdArgs& args) {
+#ifndef _MPBETA
+	const char* key, * value;
+	int i;
+	idPlayer* player;
+	idDict dict;
+
+	player = gameLocal.GetLocalPlayer();
+	if (!player || !gameLocal.CheatsOk(false)) {
+		return;
+	}
+
+	if (args.Argc() < 2 || args.Argc() % 2 == 0) { // Check for the correct number of arguments
+		gameLocal.Printf("usage: spawn numToSpawn classname [key/value pairs]\n");
+		return;
+	}
+
+	int numToSpawn = atoi(args.Argv(1)); // Get the number of entities to spawn
+
+	for (int spawnIndex = 0; spawnIndex < numToSpawn; spawnIndex++) {
+		float yaw = player->viewAngles.yaw;
+
+		value = args.Argv(2);
+		dict.Set("classname", value);
+		dict.Set("angle", va("%f", yaw + 180));
+
+		// Generate a random position within a fixed radius from the player using idRandom
+		float radius = 250.0f;
+		idRandom random;
+		random.SetSeed(gameLocal.time + spawnIndex); // Use a unique seed for each spawn
+
+		float angle = random.RandomFloat() * idMath::TWO_PI;
+		float distance = random.RandomFloat() * radius;
+		idVec3 org = player->GetPhysics()->GetOrigin() + idVec3(cos(angle) * distance, sin(angle) * distance, 0);
+
+		dict.Set("origin", org.ToString());
+
+		for (i = 3; i < args.Argc() - 1; i += 2) {
+			key = args.Argv(i);
+			value = args.Argv(i + 1);
+			dict.Set(key, value);
+		}
+
+		// RAVEN BEGIN
+		// kfuller: want to know the name of the entity I spawned
+		idEntity* newEnt = NULL;
+		gameLocal.SpawnEntityDef(dict, &newEnt);
+
+		if (newEnt) {
+			gameLocal.Printf("spawned entity '%s'\n", newEnt->name.c_str());
+		}
+		// RAVEN END
+	}
 #endif // !_MPBETA
 }
 
