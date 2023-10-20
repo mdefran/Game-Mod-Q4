@@ -282,7 +282,23 @@ idMoveable::Collide
 =================
 */
 bool idMoveable::Collide( const trace_t &collision, const idVec3 &velocity ) {
-	float len, f;
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	float cash = player->GetCash();
+
+	gameLocal.Printf("Attempting to collect chest. Funds: %f\n", player->GetCash());
+	if (cash >= 50) {
+		gameLocal.Printf("Buying chest.\n");
+		this->Hide();
+		player->SetCash(cash-50);
+	}
+	else {
+		gameLocal.Printf("Not enough cash!\n");
+	}
+
+	return false;
+
+	/*float len, f;
 	idVec3 dir;
 	idEntity *ent;
 
@@ -327,6 +343,7 @@ bool idMoveable::Collide( const trace_t &collision, const idVec3 &velocity ) {
 	}
 
 	return false;
+	*/
 }
 
 /*
@@ -597,36 +614,37 @@ void idMoveable::Event_Activate( idEntity *activator ) {
 
 	Show();
 
-	if ( !spawnArgs.GetInt( "notPushable" ) ) {
-        physicsObj.EnableImpact();
+	if (!spawnArgs.GetInt("notPushable")) {
+		physicsObj.EnableImpact();
 	}
 
 	physicsObj.Activate();
 
-	spawnArgs.GetVector( "init_velocity", "0 0 0", init_velocity );
-	spawnArgs.GetVector( "init_avelocity", "0 0 0", init_avelocity );
+	spawnArgs.GetVector("init_velocity", "0 0 0", init_velocity);
+	spawnArgs.GetVector("init_avelocity", "0 0 0", init_avelocity);
 
-	delay = spawnArgs.GetFloat( "init_velocityDelay", "0" );
-	if ( delay == 0.0f ) {
-		physicsObj.SetLinearVelocity( init_velocity );
-	} else {
-		PostEventSec( &EV_SetLinearVelocity, delay, init_velocity );
+	delay = spawnArgs.GetFloat("init_velocityDelay", "0");
+	if (delay == 0.0f) {
+		physicsObj.SetLinearVelocity(init_velocity);
+	}
+	else {
+		PostEventSec(&EV_SetLinearVelocity, delay, init_velocity);
 	}
 
-	delay = spawnArgs.GetFloat( "init_avelocityDelay", "0" );
-	if ( delay == 0.0f ) {
-		physicsObj.SetAngularVelocity( init_avelocity );
-	} else {
-		PostEventSec( &EV_SetAngularVelocity, delay, init_avelocity );
+	delay = spawnArgs.GetFloat("init_avelocityDelay", "0");
+	if (delay == 0.0f) {
+		physicsObj.SetAngularVelocity(init_avelocity);
+	}
+	else {
+		PostEventSec(&EV_SetAngularVelocity, delay, init_avelocity);
 	}
 
-	InitInitialSpline( gameLocal.time );
+	InitInitialSpline(gameLocal.time);
 
-// RAVEN BEGIN
-// jshepard: we should update it's stage on activation, specifically for falling blocks.
+	// RAVEN BEGIN
+	// jshepard: we should update it's stage on activation, specifically for falling blocks.
 	UpdateStage();
-// RAVEN END
-
+	// RAVEN END
 }
 
 /*
