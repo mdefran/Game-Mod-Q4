@@ -276,6 +276,52 @@ void idMoveable::Show( void ) {
 	}
 }
 
+enum ItemType {
+	Health = 0,
+	Dmg,
+	LifeSteal,
+	Regen,
+	Shotgun,
+	CritChance,
+	CritDmg,
+	Speed,
+	Shield
+};
+
+void givePlayerRandomItem(idPlayer *player) {
+	// Choose a random item
+	int item = static_cast<ItemType>(gameLocal.random.RandomInt(player->itemTypes));
+	switch (item) {
+	case Health:
+		player->itemHealth++;
+		break;
+	case Dmg:
+		player->itemDmg++;
+		break;
+	case LifeSteal:
+		player->itemSteal++;
+		break;
+	case Regen:
+		player->itemRegen++;
+		break;
+	case Shotgun:
+		player->itemShotgun++;
+		break;
+	case CritChance:
+		player->itemCritChance++;
+		break;
+	case CritDmg:
+		player->itemCritDmg++;
+		break;
+	case Speed:
+		player->itemSpeed++;
+		break;
+	case Shield:
+		player->itemShield++;
+		break;
+	}
+}
+
 /*
 =================
 idMoveable::Collide
@@ -291,6 +337,7 @@ bool idMoveable::Collide( const trace_t &collision, const idVec3 &velocity ) {
 		gameLocal.Printf("Buying chest.\n");
 		this->Hide();
 		player->SetCash(cash-50);
+		givePlayerRandomItem(player);
 	}
 	else {
 		gameLocal.Printf("Not enough cash!\n");

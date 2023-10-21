@@ -1080,9 +1080,23 @@ idPlayer::idPlayer
 */
 idPlayer::idPlayer() {
 	memset( &usercmd, 0, sizeof( usercmd ) );
-
-	timer = -12500; // Account for initial load in time and give the player a grace period
+	
+	// Initialize mod game mode scalars
+	timer = -12000; // Account for initial load in time and give the player a grace period
 	difficulty = 0;
+	itemTypes = 10;
+
+	// Initialize items
+	itemHealth = 0;
+	itemDmg = 0;
+	itemSteal = 10;
+	itemRegen = 0;
+	itemShotgun = 0;
+	itemCritChance = 0;
+	itemCritDmg = 0;
+	itemSpeed = 0;
+	itemShield = 0;
+	itemJump = 0;
 
 	alreadyDidTeamAnnouncerSound = false;
 
@@ -1677,7 +1691,8 @@ void idPlayer::Init( void ) {
 	// initialize the script variables
 	memset ( &pfl, 0, sizeof( pfl ) );
 	pfl.onGround = true;
-	pfl.noFallingDamage = false;
+	// Disable fall damage for jumping ability
+	pfl.noFallingDamage = true;
 
 	// Start in idle
 	SetAnimState( ANIMCHANNEL_TORSO, "Torso_Idle", 0 );
@@ -7489,9 +7504,9 @@ void idPlayer::CrashLand( const idVec3 &oldOrigin, const idVec3 &oldVelocity ) {
 	}
 
 	//jshepard: no falling damage if falling damage is disabled
-	if( pfl.noFallingDamage )	{
+	//if( pfl.noFallingDamage )	{
 		return;
-	}
+	//}
 
 	origin = GetPhysics()->GetOrigin();
 	gravityVector = physicsObj.GetGravity();
@@ -8769,6 +8784,9 @@ void idPlayer::AdjustSpeed( void ) {
 		speed *= 0.33f;
 	}
 
+	// Consider speed items
+	speed *= 1 + 0.05 * this->itemSpeed;
+
 	physicsObj.SetSpeed( speed, pm_crouchspeed.GetFloat() );
 }
 
@@ -8976,7 +8994,8 @@ void idPlayer::Move( void ) {
 
 	// set physics variables
 	physicsObj.SetMaxStepHeight( pm_stepsize.GetFloat() );
-	physicsObj.SetMaxJumpHeight( pm_jumpheight.GetFloat() );
+	// Consider jump height items
+	physicsObj.SetMaxJumpHeight( pm_jumpheight.GetFloat() + (25 * this->itemJump));
 
 	if ( noclip ) {
 		physicsObj.SetContents( 0 );
@@ -9286,6 +9305,15 @@ void idPlayer::LoadDeferredModel( void ) {
 	}
 }
 
+void PassiveItemUpdates(idPlayer* player) {
+	// Regenerate health at intervals dependent on item
+	if (player->timer >= 0 && player->timer % (60 - player->itemRegen * 5) == 0) {
+		// Consider shield item contributions
+		if (player->health < player->inventory.maxHealth + 10 * player->itemShield)
+			player->health++;
+	}
+}
+
 /*
 ==============
 EnemySpawnDirector
@@ -9324,6 +9352,7 @@ Called every tic for each player
 */
 void idPlayer::Think( void ) {
 	EnemySpawnDirector(this);
+	PassiveItemUpdates(this);
 
 	renderEntity_t *headRenderEnt;
  

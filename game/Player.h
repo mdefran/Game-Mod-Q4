@@ -270,8 +270,22 @@ public:
 class idPlayer : public idActor {
 public:
 
+	// Game mode related values
 	int timer;
 	int difficulty;
+	int itemTypes;
+	
+	// Item values
+	int itemHealth;
+	int itemDmg;
+	int itemSteal;
+	int itemRegen;
+	int itemShotgun;
+	int itemCritChance;
+	int itemCritDmg;
+	int itemSpeed;
+	int itemShield;
+	int itemJump;
 
  	enum {
  		EVENT_IMPULSE = idEntity::EVENT_MAXEVENTS,
@@ -800,6 +814,9 @@ public:
 	void					ResetCash();
 // RITUAL END
 
+	// Public for movement items
+	void					AdjustSpeed(void);
+
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );
 
@@ -1031,7 +1048,7 @@ private:
 	void					CrashLand( const idVec3 &oldOrigin, const idVec3 &oldVelocity );
 	void					BobCycle( const idVec3 &pushVelocity );
 	void					EvaluateControls( void );
-	void					AdjustSpeed( void );
+	// void					AdjustSpeed( void );
 	void					AdjustBodyAngles( void );
 	void					Move( void );
 	void					SetSpectateOrigin( void );

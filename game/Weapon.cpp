@@ -2505,6 +2505,21 @@ rvWeapon::Attack
 void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuseOffset, float power ) {
 	idVec3 muzzleOrigin;
 	idMat3 muzzleAxis;
+
+	idPlayer* player = gameLocal.GetLocalPlayer();
+
+	// Base damage scaling
+	power += 0.05 * player->itemDmg;
+	// Shotgun item
+	num_attacks += player->itemShotgun;
+	spread *= 1.3;
+	power *= 0.6;
+	// Critical strikes
+	float rand = gameLocal.random.RandomFloat();
+	if (rand < 0.05 * player->itemCritChance) {
+		power += power * (1 + 0.1 * player->itemCritDmg);
+		gameLocal.Printf("Critical strike for %f power!\n", power);
+	}
 	
 	if ( !viewModel ) {
 		common->Warning( "NULL viewmodel %s\n", __FUNCTION__ );
@@ -2523,7 +2538,7 @@ void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuse
 			return;
 		}
 
-		owner->inventory.UseAmmo( ammoType, ammoRequired );
+		owner->inventory.UseAmmo(ammoType, ammoRequired);
 		if ( clipSize && ammoRequired ) {
  			clipPredictTime = gameLocal.time;	// mp client: we predict this. mark time so we're not confused by snapshots
 			ammoClip -= 1;
@@ -2593,6 +2608,7 @@ void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuse
 	if ( !gameLocal.isClient ) {
 		idDict& dict = altAttack ? attackAltDict : attackDict;
 		power *= owner->PowerUpModifier( PMOD_PROJECTILE_DAMAGE );
+
 		if ( altAttack ? wfl.attackAltHitscan : wfl.attackHitscan ) {
 			Hitscan( dict, muzzleOrigin, muzzleAxis, num_attacks, spread, power );
 		} else {
@@ -2820,7 +2836,7 @@ void rvWeapon::Hitscan( const idDict& dict, const idVec3& muzzleOrigin, const id
 		}
 		dir.Normalize();
 
-		gameLocal.HitScan( dict, muzzleOrigin, dir, fxOrigin, owner, false, 1.0f, NULL, areas );
+		gameLocal.HitScan( dict, muzzleOrigin, dir, fxOrigin, owner, false, power, NULL, areas );
 
 		if ( gameLocal.isServer ) {
 			msg.WriteDir( dir, 24 );

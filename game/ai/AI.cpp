@@ -1521,6 +1521,11 @@ void idAI::AdjustHealthByDamage	( int damage ) {
 		return;
 	}	
 	idActor::AdjustHealthByDamage ( damage );
+	
+	// Consider life steal items
+	idPlayer *player = gameLocal.GetLocalPlayer();
+	if (player->health < player->inventory.maxHealth)
+		player->health += 0.05 * damage * player->itemSteal;
 
 	if ( g_perfTest_aiUndying.GetBool() && health <= 0 ) {
 		//so we still take pain!
