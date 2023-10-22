@@ -9307,7 +9307,7 @@ void idPlayer::LoadDeferredModel( void ) {
 
 void PassiveItemUpdates(idPlayer* player) {
 	// Regenerate health at intervals dependent on item
-	if (player->timer >= 0 && player->timer % (60 - player->itemRegen * 5) == 0) {
+	if (player->timer >= 0 && player->timer % (120 - player->itemRegen * 5) == 0) {
 		// Consider shield item contributions
 		if (player->health < player->inventory.maxHealth + 10 * player->itemShield)
 			player->health++;
@@ -9330,10 +9330,10 @@ void EnemySpawnDirector(idPlayer *player) {
 		player->difficulty++;
 
 	// Double the horde size with difficulty increase
-	int hordeSize = (1 + player->difficulty) * 2;
+	int hordeSize = (1 + player->difficulty) * 3;
 
-	// Spawn enemies every 10 seconds
-	if (player->timer >= 600 && player->timer % 600 == 0) {
+	// Spawn enemies every 10 seconds or less depending on difficulty
+	if (player->timer >= 600 && player->timer % (600 - 50 * player->difficulty) == 0) {
 		idCmdArgs args;
 		args.AppendArg("spawnRand");
 		args.AppendArg(va("%d", hordeSize));
