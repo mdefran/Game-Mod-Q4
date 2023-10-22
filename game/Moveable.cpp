@@ -285,10 +285,11 @@ enum ItemType {
 	CritChance,
 	CritDmg,
 	Speed,
-	Shield
+	Shield,
+	Jump
 };
 
-void givePlayerRandomItem(idPlayer *player) {
+void GivePlayerRandomItem(idPlayer *player) {
 	// Choose a random item
 	int item = static_cast<ItemType>(gameLocal.random.RandomInt(player->itemTypes));
 	switch (item) {
@@ -319,6 +320,9 @@ void givePlayerRandomItem(idPlayer *player) {
 	case Shield:
 		player->itemShield++;
 		break;
+	case Jump:
+		player->itemJump++;
+		break;
 	}
 }
 
@@ -332,20 +336,19 @@ bool idMoveable::Collide( const trace_t &collision, const idVec3 &velocity ) {
 	player = gameLocal.GetLocalPlayer();
 	float cash = player->GetCash();
 
-	gameLocal.Printf("Attempting to collect chest. Funds: %f\n", player->GetCash());
-	if (cash >= 50) {
-		gameLocal.Printf("Buying chest.\n");
-		this->Hide();
-		player->SetCash(cash-50);
-		givePlayerRandomItem(player);
-	}
-	else {
-		gameLocal.Printf("Not enough cash!\n");
+	idEntity* ent = gameLocal.entities[collision.c.entityNum];
+	if (ent->GetType() == player->GetType()) {
+		if (cash >= 50) {
+			this->Hide();
+			player->SetCash(cash - 50);
+			GivePlayerRandomItem(player);
+		}
 	}
 
-	return false;
+	return true;
 
-	/*float len, f;
+	/*
+	float len, f;
 	idVec3 dir;
 	idEntity *ent;
 
