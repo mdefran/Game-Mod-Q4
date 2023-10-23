@@ -1085,7 +1085,7 @@ idPlayer::idPlayer() {
 	timer = -12000; // Account for initial load in time and give the player a grace period
 	difficulty = 1;
 	itemTypes = 11;
-	activeItem = NONE;
+	activeItem = ITEM_SPREAD;
 	activeTimer = 0;
 	activeCooldown = 0;
 
@@ -9338,6 +9338,8 @@ void ActiveItemUpdates(idPlayer* player) {
 		player->godmode = false;
 	if (player->activeItem == ITEM_STROGG && player->activeTimer == 1)
 		player->team = TEAM_MARINE;
+	if (player->activeItem == ITEM_SPREAD && player->activeTimer == 1)
+		player->itemShotgun -= 20;
 }
 
 /*

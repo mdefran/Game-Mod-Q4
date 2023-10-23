@@ -185,7 +185,8 @@ void Cmd_ActivateItem_f(const idCmdArgs& args) {
 			player->activeCooldown = 3600;
 			ClearEnemies();
 			break;
-		case ITEM_PREON:
+		case ITEM_SPREAD:
+			player->itemShotgun += 20;
 			break;
 		}
 	}

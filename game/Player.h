@@ -83,7 +83,7 @@ typedef enum {
 	ITEM_TELEPORT,
 	ITEM_STROGG,
 	ITEM_CLEAR,
-	ITEM_PREON
+	ITEM_SPREAD
 } activeItem_t;
 
 typedef enum {

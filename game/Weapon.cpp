@@ -2513,8 +2513,10 @@ void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuse
 
 	// Shotgun item
 	num_attacks += player->itemShotgun;
-	spread *= 1.75;
-	power *= 0.6;
+	for (int i = 0; i < player->itemShotgun; i++) {
+		spread += 0.35;
+		power *= 0.95;
+	}
 
 	// Critical strikes
 	float rand = gameLocal.random.RandomFloat();
