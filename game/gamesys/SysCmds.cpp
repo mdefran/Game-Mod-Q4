@@ -126,9 +126,16 @@ void ClearEnemies() {
 	Cmd_KillMonsters_f(args);
 }
 
-void SpawnGuidedMissile(idPlayer* player) {
-	idGuidedProjectile missile = idGuidedProjectile();
-
+void Cmd_Help_f(const idCmdArgs& args) {
+	gameLocal.Printf("===========================\n\nRISK OF QUAKE TUTORIAL\n\n===========================\n\n");
+	gameLocal.Printf("This mod is based on Risk of Rain 2. You will notice that there are a number of chests randomly scattered on the ground.\n");
+	gameLocal.Printf("You can open these chests by walking into them. To do so, you need enough money. Your money is displayed in the top left.\n");
+	gameLocal.Printf("You earn money by killing enemies. Enemies spawn in progressively harder waves every 15 seconds.\n");
+	gameLocal.Printf("Every 90 seconds, the difficulty will increase, and new enemies with harder behaviors will spawn.\n");
+	gameLocal.Printf("When you open a chest, it will disappear and you will receive an item. Most items are passive and buff your stats.\n");
+	gameLocal.Printf("There is a chance you get an active item. You can only hold one active item at a time.\n");
+	gameLocal.Printf("You can use your active item by pressing 'e' on your keyboard. You must then wait until the cooldown has finished to use it again.\n");
+	gameLocal.Printf("Try surviving as long as you can. Good luck!\n");
 }
 
 void Cmd_ActivateItem_f(const idCmdArgs& args) {
@@ -3389,6 +3396,7 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand("pos", Cmd_PrintPosition_f, CMD_FL_GAME, "Print the player's position.");
 	cmdSystem->AddCommand("spawnRand", Cmd_SpawnRandom_f, CMD_FL_GAME, "Spawn a monster in a random position a fixed radius from the player.");
 	cmdSystem->AddCommand("active", Cmd_ActivateItem_f, CMD_FL_GAME, "Activate the player's active item.");
+	cmdSystem->AddCommand("guide", Cmd_Help_f, CMD_FL_GAME, "Print a help screen to the player.");
 }
 
 /*
