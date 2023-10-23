@@ -10,4 +10,8 @@ void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value );
 
 void Cmd_SpawnRandom_f(const idCmdArgs& args);
 
+void Cmd_ActivateItem_f(const idCmdArgs& args);
+
+void Cmd_KillMonsters_f(const idCmdArgs& args);
+
 #endif /* !__SYS_CMDS_H__ */

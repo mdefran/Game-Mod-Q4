@@ -163,6 +163,84 @@ void Cmd_SpawnRandom_f(const idCmdArgs& args) {
 #endif // !_MPBETA
 }
 
+void TeleportPlayer(idPlayer *player) {
+	player->activeCooldown = 900;
+	idVec3 forwardVector = player->viewAngles.ToForward();
+	idVec3 destination = player->GetPhysics()->GetOrigin() + (forwardVector * 300);
+	idAngles angles = player->viewAngles;
+	player->Teleport(destination, angles, nullptr);
+}
+
+void SpawnAllies(idPlayer* player) {
+	idCmdArgs args;
+	args.AppendArg("spawnRand");
+	args.AppendArg(va("%d", 3));
+	args.AppendArg("char_marine");
+	Cmd_SpawnRandom_f(args);
+}
+
+void ClearEnemies() {
+	idCmdArgs args;
+	args.AppendArg("killMonsters");
+	Cmd_KillMonsters_f(args);
+}
+
+void SpawnGuidedMissile(idPlayer* player) {
+	idGuidedProjectile missile = idGuidedProjectile();
+
+}
+
+void Cmd_ActivateItem_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (!player) {
+		common->Printf("ERROR: Cmd_ActivateItem_f failed, since GetLocalPlayer() was NULL.\n");
+		return;
+	}
+	activeItem_t activeItem = player->activeItem;
+
+	// Do not allow the player to use abilities that are on CD
+	if (!player->activeCooldown && player->activeItem != NONE) {
+		player->activeCooldown = 1800;
+		player->activeTimer = 600;
+		switch (activeItem) {
+		case ITEM_FULLHEAL:
+			player->health = player->inventory.maxHealth + player->itemShield * 10;
+			break;
+		case ITEM_ARMOR:
+			player->inventory.armor = 100;
+			break;
+		case ITEM_CRITCHANCE:
+			player->itemCritChance += 20;
+			break;
+		case ITEM_HASTE:
+			player->itemSpeed += 20;
+			break;
+		case ITEM_GOD:
+			player->activeTimer = 300;
+			player->godmode = true;
+			break;
+		case ITEM_TELEPORT:
+			player->activeTimer = 0;
+			TeleportPlayer(player);
+			break;
+		case ITEM_SPAWNER:
+			player->activeTimer = 0;
+			SpawnAllies(player);
+			break;
+		case ITEM_STROGG:
+			player->team = TEAM_STROGG;
+			break;
+		case ITEM_CLEAR:
+			player->activeTimer = 0;
+			player->activeCooldown = 3600;
+			ClearEnemies();
+			break;
+		case ITEM_PREON:
+			break;
+		}
+	}
+}
+
 /*
 ==================
 Cmd_GetFloatArg
@@ -3367,6 +3445,7 @@ void idGameLocal::InitConsoleCommands( void ) {
 
 	cmdSystem->AddCommand("pos", Cmd_PrintPosition_f, CMD_FL_GAME, "Print the player's position.");
 	cmdSystem->AddCommand("spawnRand", Cmd_SpawnRandom_f, CMD_FL_GAME, "Spawn a monster in a random position a fixed radius from the player.");
+	cmdSystem->AddCommand("active", Cmd_ActivateItem_f, CMD_FL_GAME, "Activate the player's active item.");
 }
 
 /*

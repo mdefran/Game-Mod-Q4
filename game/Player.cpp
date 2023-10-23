@@ -1084,7 +1084,10 @@ idPlayer::idPlayer() {
 	// Initialize mod game mode scalars
 	timer = -12000; // Account for initial load in time and give the player a grace period
 	difficulty = 0;
-	itemTypes = 10;
+	itemTypes = 11;
+	activeItem = NONE;
+	activeTimer = 0;
+	activeCooldown = 0;
 
 	// Initialize items
 	itemHealth = 0;
@@ -9316,6 +9319,28 @@ void PassiveItemUpdates(idPlayer* player) {
 	}
 }
 
+void ActiveItemUpdates(idPlayer* player) {
+	if (player->activeTimer > 0)
+		player->activeTimer -= 1;
+	if (player->activeCooldown)
+		player->activeCooldown -= 1;
+	if (player->activeTimer == 1)
+		gameLocal.Printf("Item effect expired.\n");
+	if (player->activeCooldown == 1)
+		gameLocal.Printf("Item cooldown finished.\n");
+
+	// Undo passive amps from active items
+	if (player->activeItem == ITEM_CRITCHANCE && player->activeTimer == 1)
+		player->itemCritChance -= 20;
+	if (player->activeItem == ITEM_HASTE && player->activeTimer == 1)
+		player->itemSpeed -= 20;
+	if (player->activeItem == ITEM_GOD && player->activeTimer == 1)
+		player->godmode = false;
+	if (player->activeItem == ITEM_STROGG && player->activeTimer == 1)
+		player->team = TEAM_MARINE;
+
+}
+
 /*
 ==============
 EnemySpawnDirector
@@ -9355,6 +9380,7 @@ Called every tic for each player
 void idPlayer::Think( void ) {
 	EnemySpawnDirector(this);
 	PassiveItemUpdates(this);
+	ActiveItemUpdates(this);
 
 	renderEntity_t *headRenderEnt;
  

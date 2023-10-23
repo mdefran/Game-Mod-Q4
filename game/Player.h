@@ -73,6 +73,20 @@ typedef struct
 // RAVEN END
 
 typedef enum {
+	NONE,
+	ITEM_FULLHEAL,
+	ITEM_ARMOR,
+	ITEM_CRITCHANCE,
+	ITEM_SPAWNER,
+	ITEM_HASTE,
+	ITEM_GOD,
+	ITEM_TELEPORT,
+	ITEM_STROGG,
+	ITEM_CLEAR,
+	ITEM_PREON
+} activeItem_t;
+
+typedef enum {
 	FOCUS_NONE,
 	FOCUS_GUI,
 	FOCUS_BRACKETS,
@@ -274,6 +288,9 @@ public:
 	int timer;
 	int difficulty;
 	int itemTypes;
+	activeItem_t activeItem;
+	int activeTimer;
+	int activeCooldown;
 	
 	// Item values
 	int itemHealth;

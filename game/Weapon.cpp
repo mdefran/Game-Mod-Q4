@@ -2510,14 +2510,16 @@ void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuse
 
 	// Base damage scaling
 	power += 0.05 * player->itemDmg;
+
 	// Shotgun item
 	num_attacks += player->itemShotgun;
-	spread *= 1.3;
+	spread *= 1.75;
 	power *= 0.6;
+
 	// Critical strikes
 	float rand = gameLocal.random.RandomFloat();
 	if (rand < 0.05 * player->itemCritChance) {
-		power += power * (1 + 0.1 * player->itemCritDmg);
+		power += power * (2 + 0.1 * player->itemCritDmg);
 		gameLocal.Printf("Critical strike for %f power!\n", power);
 	}
 	

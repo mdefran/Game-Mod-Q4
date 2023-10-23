@@ -286,8 +286,14 @@ enum ItemType {
 	CritDmg,
 	Speed,
 	Shield,
-	Jump
+	Jump,
+	Active
 };
+
+void GivePlayerRandomActive(idPlayer* player) {
+	activeItem_t active = static_cast<activeItem_t>(gameLocal.random.RandomInt(10));
+	player->activeItem = active;
+}
 
 void GivePlayerRandomItem(idPlayer *player) {
 	// Choose a random item
@@ -322,6 +328,9 @@ void GivePlayerRandomItem(idPlayer *player) {
 		break;
 	case Jump:
 		player->itemJump++;
+		break;
+	case Active:
+		GivePlayerRandomActive(player);
 		break;
 	}
 }
