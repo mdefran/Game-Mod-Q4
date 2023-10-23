@@ -200,8 +200,10 @@ void Cmd_ActivateItem_f(const idCmdArgs& args) {
 
 	// Do not allow the player to use abilities that are on CD
 	if (!player->activeCooldown && player->activeItem != NONE) {
+		// Default cooldown values
 		player->activeCooldown = 1800;
 		player->activeTimer = 600;
+
 		switch (activeItem) {
 		case ITEM_FULLHEAL:
 			player->health = player->inventory.maxHealth + player->itemShield * 10;
