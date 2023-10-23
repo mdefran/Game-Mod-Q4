@@ -1083,7 +1083,7 @@ idPlayer::idPlayer() {
 	
 	// Initialize mod game mode scalars
 	timer = -12000; // Account for initial load in time and give the player a grace period
-	difficulty = 0;
+	difficulty = 1;
 	itemTypes = 11;
 	activeItem = NONE;
 	activeTimer = 0;
@@ -9338,7 +9338,6 @@ void ActiveItemUpdates(idPlayer* player) {
 		player->godmode = false;
 	if (player->activeItem == ITEM_STROGG && player->activeTimer == 1)
 		player->team = TEAM_MARINE;
-
 }
 
 /*
@@ -9352,21 +9351,57 @@ void EnemySpawnDirector(idPlayer *player) {
 	// Increase the timer every tic the player is alive
 	player->timer++;
 
-	// Increase the difficulty coefficient every minute
-	if (player->timer >= 3600 && player->timer % 3600 == 0)
+	// Increase the difficulty coefficient every 1.5 minutes
+	if (player->timer >= 5400 && player->timer % 5400 == 0)
 		player->difficulty++;
 
-	// Double the horde size with difficulty increase
-	int hordeSize = (1 + player->difficulty) * 3;
+	// The horde budget should double with difficulty increases
+	int hordeBudget = player->difficulty * 3;
 
-	// Spawn enemies every 10 seconds or less depending on difficulty
-	if (player->timer >= 600 && player->timer % (600 - 50 * player->difficulty) == 0) {
-		idCmdArgs args;
-		args.AppendArg("spawnRand");
-		args.AppendArg(va("%d", hordeSize));
-		args.AppendArg("monster_strogg_marine");
+	// Spawn enemies every 15 seconds
+	if (player->timer >= 900 && player->timer % 900 == 0) {
+		while (hordeBudget >= 0) {
+			// Set up spawning command
+			idCmdArgs args;
+			args.AppendArg("spawnRand");
+			args.AppendArg(va("%d", 1));
 
-		Cmd_SpawnRandom_f(args);
+			// Unlock a new monster type with every difficulty increase, up to 5
+			int monsterType = (player->difficulty < 7) ? gameLocal.random.RandomInt(player->difficulty + 1) : gameLocal.random.RandomInt(7);
+			switch (monsterType) {
+			case 0:
+				args.AppendArg("monster_strogg_marine");
+				hordeBudget -= 1;
+				break;
+			case 1:
+				args.AppendArg("monster_strogg_marine_sgun");
+				hordeBudget -= 1;
+				break;
+			case 2:
+				args.AppendArg("monster_strogg_marine_mgun");
+				hordeBudget -= 2;
+				break;
+			case 3:
+				args.AppendArg("monster_strogg_marine_grunt");
+				hordeBudget -= 3;
+				break;
+			case 4:
+				args.AppendArg("monster_grunt");
+				hordeBudget -= 3;
+				break;
+			case 5:
+				args.AppendArg("monster_gunner");
+				hordeBudget -= 3;
+				break;
+			case 6:
+				args.AppendArg("monster_network_guardian");
+				hordeBudget -= 10;
+				break;
+			}
+
+			// Spawn the monster
+			Cmd_SpawnRandom_f(args);
+		}
 	}
 }
 
@@ -9378,6 +9413,7 @@ Called every tic for each player
 ==============
 */
 void idPlayer::Think( void ) {
+	// Mod related functions
 	EnemySpawnDirector(this);
 	PassiveItemUpdates(this);
 	ActiveItemUpdates(this);
