@@ -1136,12 +1136,6 @@ idAI::Think
 =====================
 */
 void idAI::Think( void ) {
-	/*
-	idPlayer* player = gameLocal.GetLocalPlayer();
-	if (TravelDistance(this, player) > 1)
-		gameLocal.Printf("far away!\n");
-	*/
-
 	// if we are completely closed off from the player, don't do anything at all
 	if ( CheckDormant() ) {
 		return;
