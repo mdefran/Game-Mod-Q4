@@ -154,7 +154,7 @@ void Cmd_ActivateItem_f(const idCmdArgs& args) {
 
 		switch (activeItem) {
 		case ITEM_FULLHEAL:
-			player->health = player->inventory.maxHealth + player->itemShield * 10;
+			player->health = player->inventory.maxHealth + 10 * player->itemHealth;
 			break;
 		case ITEM_ARMOR:
 			player->inventory.armor = 100;

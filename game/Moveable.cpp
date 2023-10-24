@@ -325,6 +325,7 @@ void GivePlayerRandomItem(idPlayer *player) {
 		break;
 	case Shield:
 		player->itemShield++;
+		player->health += 50;
 		break;
 	case Jump:
 		player->itemJump++;

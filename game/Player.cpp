@@ -1082,17 +1082,17 @@ idPlayer::idPlayer() {
 	memset( &usercmd, 0, sizeof( usercmd ) );
 	
 	// Initialize mod game mode scalars
-	timer = -12000; // Account for initial load in time and give the player a grace period
+	timer = -11500; // Account for initial load in time and give the player a grace period
 	difficulty = 1;
 	itemTypes = 11;
-	activeItem = ITEM_SPREAD;
+	activeItem = NONE;
 	activeTimer = 0;
 	activeCooldown = 0;
 
 	// Initialize items
 	itemHealth = 0;
 	itemDmg = 0;
-	itemSteal = 10;
+	itemSteal = 0;
 	itemRegen = 0;
 	itemShotgun = 0;
 	itemCritChance = 0;
@@ -3421,7 +3421,67 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	
 	assert ( _hud );
 
+	// Set GUI variables
+	idStr active_item;
+	switch (this->activeItem) {
+	case ITEM_ARMOR:
+		active_item = idStr("Armor");
+		break;
+	case ITEM_CLEAR:
+		active_item = idStr("Full Clear");
+		break;
+	case ITEM_CRITCHANCE:
+		active_item = idStr("Critical Strikes");
+		break;
+	case ITEM_FULLHEAL:
+		active_item = idStr("Full Heal");
+		break;
+	case ITEM_GOD:
+		active_item = idStr("Invincible");
+		break;
+	case ITEM_HASTE:
+		active_item = idStr("Speed");
+		break;
+	case ITEM_SPAWNER:
+		active_item = idStr("Backup");
+		break;
+	case ITEM_SPREAD:
+		active_item = idStr("Shotgun");
+		break;
+	case ITEM_STROGG:
+		active_item = idStr("Undetectable");
+		break;
+	case ITEM_TELEPORT:
+		active_item = idStr("Teleport");
+		break;
+	default:
+		active_item = idStr("None");
+		break;
+	}
+	idStr player_cooldown = (this->activeCooldown) ? idStr("On Cooldown") : idStr("");
+	idStr player_effect = (this->activeTimer) ? idStr("Activated") : idStr("");
+
+	// Add modded GUI elements
+	
+	// Economy
 	_hud->SetStateInt("player_balance", (int)(this->GetCash()));
+
+	// Active items
+	_hud->SetStateString("player_active_item", active_item.c_str());
+	_hud->SetStateString("player_cooldown", player_cooldown.c_str());
+	_hud->SetStateString("player_effect", player_effect.c_str());
+	
+	// Passive items
+	_hud->SetStateInt("item_cchance", this->itemCritChance);
+	_hud->SetStateInt("item_cdmg", this->itemCritDmg);
+	_hud->SetStateInt("item_dmg", this->itemDmg);
+	_hud->SetStateInt("item_steal", this->itemSteal);
+	_hud->SetStateInt("item_health", this->itemHealth);
+	_hud->SetStateInt("item_regen", this->itemRegen);
+	_hud->SetStateInt("item_shield", this->itemShield);
+	_hud->SetStateInt("item_shotgun", this->itemShotgun);
+	_hud->SetStateInt("item_speed", this->itemSpeed);
+	_hud->SetStateInt("item_jump", this->itemJump);
 
 	temp = _hud->State().GetInt ( "player_health", "-1" );
 	if ( temp != health ) {		
@@ -9314,7 +9374,7 @@ void PassiveItemUpdates(idPlayer* player) {
 	// Regenerate health at intervals dependent on item
 	if (player->timer >= 0 && player->timer % (120 - player->itemRegen * 5) == 0) {
 		// Consider shield item contributions
-		if (player->health < player->inventory.maxHealth + 10 * player->itemShield)
+		if (player->health < player->inventory.maxHealth + 10 * player->itemHealth)
 			player->health++;
 	}
 }
