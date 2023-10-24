@@ -922,7 +922,7 @@
 	"#str_200932"	"FAVORITE SERVER"
 	"#str_200933"	"PASSWORD ENABLED"
 	"#str_200934"	"DEDICATED SERVER"
-	"#str_200935"	"This mod is based on Risk of Rain 2. You will notice that there are a number of chests randomly scattered on the ground.\nYou can open these chests by walking into them. To do so, you need enough money. Your money is displayed in the top left.\nYou earn money by killing enemies. Enemies spawn in progressively harder waves every 15 seconds.\nEvery 90 seconds, the difficulty will increase, and new enemies with harder behaviors will spawn.\nWhen you open a chest, it will disappear and you will receive an item. Most items are passive and buff your stats.\nThere is a chance you get an active item. You can only hold one active item at a time.\nYou can use your active item by pressing 'e' on your keyboard. You must then wait until the cooldown has finished to use it again.\nTry surviving as long as you can. Good luck!\n"
+	"#str_200935"	"Kill monsters for $. Walk into chests to open them."
 	"#str_200936"	"ENTER"
 	"#str_200937"	"- CLICK TO CONTINUE -"
 	"#str_200938"	"LOADING"
